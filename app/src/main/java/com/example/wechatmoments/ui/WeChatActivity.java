@@ -1,20 +1,23 @@
 package com.example.wechatmoments.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.wechatmoments.R;
 import com.example.wechatmoments.repository.WeChatRepositoryImpl;
 
-public class WeChatActivity extends AppCompatActivity {
+public class WeChatActivity extends AppCompatActivity{
     private WeChatViewModel weChatViewModel;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private MyAdapter myAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +27,19 @@ public class WeChatActivity extends AppCompatActivity {
         weChatViewModel.findUser();
         weChatViewModel.findWeChatMoment();
         displayWeChatTweets();
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        recyclerView = findViewById(R.id.my_recycle_view);
+        swipeRefreshLayout.setRefreshing(false);
+        swipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light,
+                android.R.color.holo_purple);
+        swipeRefreshLayout.setOnRefreshListener(() -> new Handler().postDelayed(() -> {
+            weChatViewModel.findWeChatMoment();
+            myAdapter.notifyDataSetChanged();
+            swipeRefreshLayout.setRefreshing(false);
+        }, 1000));
     }
 
     private void obtainViewModel() {
@@ -34,13 +50,15 @@ public class WeChatActivity extends AppCompatActivity {
 
     private void displayWeChatTweets() {
         weChatViewModel.observerWeChatMoment(this, weChatMoments -> {
-            recyclerView = findViewById(R.id.my_recycle_view);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setHasFixedSize(true);
-            layoutManager = new LinearLayoutManager(this);
-            recyclerView.setLayoutManager(layoutManager);
             myAdapter = new MyAdapter(weChatMoments, weChatViewModel, weChatViewModel.getUser());
             recyclerView.setAdapter(myAdapter);
         });
     }
 
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
 }

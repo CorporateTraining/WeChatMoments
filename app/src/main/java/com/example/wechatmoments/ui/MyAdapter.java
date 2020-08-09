@@ -20,6 +20,7 @@ import com.example.wechatmoments.repository.entity.WeChatMoment;
 import com.jaeger.ninegridimageview.NineGridImageView;
 import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.jaeger.ninegridimageview.NineGridImageView.STYLE_FILL;
