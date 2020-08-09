@@ -102,17 +102,25 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private void displayWeChatHeader(HeaderViewHolder holder) {
         holder.username.setText(user.getNick());
+        glideImage(user.getAvatar(), holder.headerAvatar, 20);
+        glideImage(user.getProfileImage(), holder.profileImage);
+    }
+
+    public void glideImage(String url, ImageView imageView) {
         Glide.with(context)
-                .load(user.getAvatar())
+                .load(url)
                 .centerCrop()
                 .placeholder(R.drawable.loading)
-                .apply(RequestOptions.bitmapTransform(new RoundedCorners(20)))
-                .into(holder.headerAvatar);
+                .into(imageView);
+    }
+
+    public void glideImage(String url, ImageView imageView, int roundedCorners) {
         Glide.with(context)
-                .load(user.getProfileImage())
+                .load(url)
                 .centerCrop()
                 .placeholder(R.drawable.loading)
-                .into(holder.profileImage);
+                .apply(RequestOptions.bitmapTransform(new RoundedCorners(roundedCorners)))
+                .into(imageView);
     }
 
     private void displayWeChatMoments(@NonNull MyViewHolder holder, int position) {
@@ -146,22 +154,13 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holder.nineGridImageView.setAdapter(new NineGridImageViewAdapter<String>() {
             @Override
             protected void onDisplayImage(Context context, ImageView imageView, String url) {
-                Glide.with(context)
-                        .load(url)
-                        .placeholder(R.drawable.loading)
-                        .centerCrop()
-                        .into(imageView);
+                glideImage(url, imageView);
             }
         });
     }
 
     private void displayAvatarAndUserName(@NonNull MyViewHolder holder, User sender) {
-        Glide.with(context)
-                .load(sender.getAvatar())
-                .centerCrop()
-                .apply(RequestOptions.bitmapTransform(new RoundedCorners(20)))
-                .placeholder(R.drawable.loading)
-                .into(holder.avatar);
+        glideImage(sender.getAvatar(), holder.avatar, 20);
         holder.senderUsername.setText(sender.getNick());
     }
 
