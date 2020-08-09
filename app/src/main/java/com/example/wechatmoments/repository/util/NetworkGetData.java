@@ -1,8 +1,5 @@
 package com.example.wechatmoments.repository.util;
 
-import com.example.wechatmoments.repository.entity.WeChatMoment;
-import com.google.gson.reflect.TypeToken;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

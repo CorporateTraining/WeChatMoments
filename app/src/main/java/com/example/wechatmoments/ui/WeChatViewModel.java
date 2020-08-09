@@ -46,28 +46,6 @@ public class WeChatViewModel extends ViewModel {
         weChatMomentsMutableLiveData.observe(owner, observer);
     }
 
-    public List<WeChatMoment> getWeChatMoments(int firstIndex, int lastIndex) {
-        List<WeChatMoment> value = weChatMomentsMutableLiveData.getValue();
-        if (value == null) {
-            return null;
-        }
-        List<WeChatMoment> weChatMomentsFilter = filterCorrectWeChatMoments(value);
-        if (weChatMomentsFilter.size() <= firstIndex) {
-            return null;
-        }
-        if (weChatMomentsFilter.size() < lastIndex) {
-            lastIndex = weChatMomentsFilter.size();
-        }
-        return weChatMomentsFilter.subList(firstIndex, lastIndex);
-    }
-
-    @NotNull
-    private List<WeChatMoment> filterCorrectWeChatMoments(List<WeChatMoment> value) {
-        return value.stream()
-                .filter(weChatMoment -> weChatMoment.getSender() != null)
-                .collect(Collectors.toList());
-    }
-
     public void findUser() {
         Maybe<User> user = weChatRepository.findUser();
         user.subscribeOn(Schedulers.io())
@@ -131,6 +109,28 @@ public class WeChatViewModel extends ViewModel {
                     }
                 });
 
+    }
+
+    public List<WeChatMoment> getWeChatMoments(int firstIndex, int lastIndex) {
+        List<WeChatMoment> value = weChatMomentsMutableLiveData.getValue();
+        if (value == null) {
+            return null;
+        }
+        List<WeChatMoment> weChatMomentsFilter = filterCorrectWeChatMoments(value);
+        if (weChatMomentsFilter.size() <= firstIndex) {
+            return null;
+        }
+        if (weChatMomentsFilter.size() < lastIndex) {
+            lastIndex = weChatMomentsFilter.size();
+        }
+        return weChatMomentsFilter.subList(firstIndex, lastIndex);
+    }
+
+    @NotNull
+    private List<WeChatMoment> filterCorrectWeChatMoments(List<WeChatMoment> value) {
+        return value.stream()
+                .filter(weChatMoment -> weChatMoment.getSender() != null)
+                .collect(Collectors.toList());
     }
 
     @Override

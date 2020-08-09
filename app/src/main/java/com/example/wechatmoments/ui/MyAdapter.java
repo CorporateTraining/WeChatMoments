@@ -1,9 +1,6 @@
 package com.example.wechatmoments.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,19 +12,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.example.wechatmoments.R;
 import com.example.wechatmoments.repository.entity.User;
 import com.example.wechatmoments.repository.entity.WeChatMoment;
 import com.jaeger.ninegridimageview.NineGridImageView;
 import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 
-import java.util.Collections;
 import java.util.List;
 
 import static com.example.wechatmoments.ui.WeChatActivity.PAGE_COUNT;
@@ -89,7 +81,6 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (hasMoreTweets) {
             holder.footView.setText(R.string.footer_view_more);
             new Handler().postDelayed(() -> updateRecyclerView(getWeChatMomentsCount(), getWeChatMomentsCount() + PAGE_COUNT), 500);
-
         } else {
             holder.footView.setText(R.string.footer_view_no_more);
         }

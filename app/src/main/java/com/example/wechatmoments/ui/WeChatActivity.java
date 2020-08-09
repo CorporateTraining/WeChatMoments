@@ -16,18 +16,19 @@ public class WeChatActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MyAdapter myAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    public static final int INIT_NUMBER = 0;
     public static final int PAGE_COUNT = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_we_chat);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        recyclerView = findViewById(R.id.my_recycle_view);
         obtainViewModel();
         weChatViewModel.findUser();
         weChatViewModel.findWeChatMoment(null);
         displayWeChatTweets();
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
-        recyclerView = findViewById(R.id.my_recycle_view);
         dropDownRefreshData();
     }
 
@@ -54,7 +55,7 @@ public class WeChatActivity extends AppCompatActivity {
         weChatViewModel.observerWeChatMoment(this, weChatMoments -> {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setHasFixedSize(true);
-            myAdapter = new MyAdapter(weChatViewModel.getWeChatMoments(0, PAGE_COUNT), weChatViewModel, weChatViewModel.getUser());
+            myAdapter = new MyAdapter(weChatViewModel.getWeChatMoments(INIT_NUMBER, PAGE_COUNT), weChatViewModel, weChatViewModel.getUser());
             myAdapter.setHasMoreTweets(weChatMoments.size() > PAGE_COUNT);
             recyclerView.setAdapter(myAdapter);
         });
