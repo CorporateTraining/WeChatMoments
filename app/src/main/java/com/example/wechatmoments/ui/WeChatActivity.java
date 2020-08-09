@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.wechatmoments.MainApplication;
 import com.example.wechatmoments.R;
-import com.example.wechatmoments.repository.WeChatRepositoryImpl;
 
 public class WeChatActivity extends AppCompatActivity {
     private WeChatViewModel weChatViewModel;
@@ -46,7 +46,7 @@ public class WeChatActivity extends AppCompatActivity {
     }
 
     private void obtainViewModel() {
-        WeChatRepository weChatRepository = new WeChatRepositoryImpl();
+        WeChatRepository weChatRepository = (((MainApplication) getApplicationContext())).getWeChatRepository();
         weChatViewModel = new ViewModelProvider(this).get(WeChatViewModel.class);
         weChatViewModel.setWeChatRepository(weChatRepository);
     }
