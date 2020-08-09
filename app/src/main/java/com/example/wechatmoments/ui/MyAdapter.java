@@ -2,10 +2,12 @@ package com.example.wechatmoments.ui;
 
 import android.content.Context;
 import android.os.Handler;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +19,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.wechatmoments.R;
 import com.example.wechatmoments.repository.entity.User;
 import com.example.wechatmoments.repository.entity.WeChatMoment;
+import com.example.wechatmoments.repository.entity.vo.Comment;
 import com.jaeger.ninegridimageview.NineGridImageView;
 import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 
@@ -115,8 +118,24 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         User sender = weChatMoment.getSender();
         initGridImageView(holder);
         displayAvatarAndUserName(holder, sender);
-        displayContent(holder, weChatMoment);
-        displayImages(holder, weChatMoment);
+        displayContent(holder, weChatMoment.getContent());
+        displayImages(holder, weChatMoment.getImages());
+        displayComments(holder, weChatMoment.getComments());
+    }
+
+    private void displayComments(MyViewHolder holder, List<Comment> comments) {
+        if (comments != null && comments.size() > 0) {
+            holder.commentsView.setVisibility(View.VISIBLE);
+            for (Comment comment : comments) {
+                TextView textview = new TextView(context);
+                User sender = comment.getSender();
+                textview.setText(Html.fromHtml(String.format("<font color='#5a6a91'><b>%s</b></font>: %s", sender.getNick(), comment.getContent()), Html.FROM_HTML_MODE_LEGACY));
+
+                holder.commentsView.addView(textview);
+            }
+        } else {
+            holder.commentsView.setVisibility(View.GONE);
+        }
     }
 
     private void initGridImageView(@NonNull MyViewHolder holder) {
@@ -142,8 +161,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holder.senderUsername.setText(sender.getNick());
     }
 
-    private void displayImages(@NonNull MyViewHolder holder, WeChatMoment weChatMoment) {
-        List<String> images = weChatMoment.getImages();
+    private void displayImages(@NonNull MyViewHolder holder, List<String> images) {
         if (images != null) {
             holder.nineGridImageView.setVisibility(View.VISIBLE);
             holder.nineGridImageView.setImagesData(images);
@@ -152,8 +170,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    private void displayContent(@NonNull MyViewHolder holder, WeChatMoment weChatMoment) {
-        String content = weChatMoment.getContent();
+    private void displayContent(@NonNull MyViewHolder holder, String content) {
         if (content != null) {
             holder.senderContent.setVisibility(View.VISIBLE);
             holder.senderContent.setText(content);
@@ -194,6 +211,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private TextView senderUsername, senderContent;
         private ImageView avatar;
         private NineGridImageView nineGridImageView;
+        private LinearLayout commentsView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -201,6 +219,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.senderContent = itemView.findViewById(R.id.sender_content);
             this.avatar = itemView.findViewById(R.id.tweets_avatar);
             this.nineGridImageView = itemView.findViewById(R.id.images_view);
+            this.commentsView = itemView.findViewById(R.id.comments_view);
         }
     }
 
