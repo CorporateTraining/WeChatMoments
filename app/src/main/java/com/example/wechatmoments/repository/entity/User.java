@@ -9,6 +9,16 @@ public class User {
     @SerializedName("profile-image")
     private String profileImage;
 
+    public User() {
+    }
+
+    public User(String username, String nick, String avatar, String profileImage) {
+        this.username = username;
+        this.nick = nick;
+        this.avatar = avatar;
+        this.profileImage = profileImage;
+    }
+
     public String getNick() {
         return nick;
     }
@@ -19,5 +29,9 @@ public class User {
 
     public String getProfileImage() {
         return profileImage;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }
