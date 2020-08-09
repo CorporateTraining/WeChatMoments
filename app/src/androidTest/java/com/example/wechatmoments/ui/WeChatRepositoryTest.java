@@ -56,4 +56,18 @@ public class WeChatRepositoryTest {
                 .assertValue(user -> CREATE_USERNAME.equals(user.getUsername()));
     }
 
+    @Test
+    public void should_find_correct_user_by_net_work() {
+        String USERNAME = "jsmith";
+        String NICK = "John Smith";
+        String AVATAR = "https://s3.amazonaws.com/uifaces/faces/twitter/mahmoudmetwally/128.jpg";
+        String PROFILE_IMAGE = "http://lorempixel.com/480/280/technics/6/";
+        weChatRepository.findUserByNetWork()
+                .test()
+                .assertValue(user -> NICK.equals(user.getNick()))
+                .assertValue(user -> AVATAR.equals(user.getAvatar()))
+                .assertValue(user -> PROFILE_IMAGE.equals(user.getProfileImage()))
+                .assertValue(user -> USERNAME.equals(user.getUsername()));
+    }
+
 }
