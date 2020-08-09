@@ -28,7 +28,7 @@ public class WeChatActivity extends AppCompatActivity {
         obtainViewModel();
         weChatViewModel.findUser();
         weChatViewModel.findWeChatMoment(null);
-        displayWeChatTweets();
+        displayWeChatMoments();
         dropDownRefreshData();
     }
 
@@ -51,12 +51,12 @@ public class WeChatActivity extends AppCompatActivity {
         weChatViewModel.setWeChatRepository(weChatRepository);
     }
 
-    private void displayWeChatTweets() {
+    private void displayWeChatMoments() {
         weChatViewModel.observerWeChatMoment(this, weChatMoments -> {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setHasFixedSize(true);
             myAdapter = new MyAdapter(weChatViewModel.getWeChatMoments(INIT_NUMBER, PAGE_COUNT), weChatViewModel, weChatViewModel.getUser());
-            myAdapter.setHasMoreTweets(weChatMoments.size() > PAGE_COUNT);
+            myAdapter.setHasMoreMoments(weChatMoments.size() > PAGE_COUNT);
             recyclerView.setAdapter(myAdapter);
         });
     }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="350dp"
-    android:background="@color/tweetsItemBackground"
+    android:background="@color/momentItemBackground"
     tools:context=".ui.WeChatActivity">
 
     <ImageView

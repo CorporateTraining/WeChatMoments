@@ -36,7 +36,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_FOOTER = -1;
-    private boolean hasMoreTweets;
+    private boolean hasMoreMoments;
 
     public MyAdapter(List<WeChatMoment> weChatMoments, WeChatViewModel weChatViewModel, User user) {
         this.weChatMoments = weChatMoments;
@@ -44,8 +44,8 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.user = user;
     }
 
-    public void setHasMoreTweets(boolean hasMoreTweets) {
-        this.hasMoreTweets = hasMoreTweets;
+    public void setHasMoreMoments(boolean hasMoreMoments) {
+        this.hasMoreMoments = hasMoreMoments;
     }
 
     @NonNull
@@ -60,7 +60,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 View footerView = LayoutInflater.from(context).inflate(R.layout.activity_foot_view, parent, false);
                 return new FooterViewHolder(footerView);
             default:
-                View titleView = LayoutInflater.from(context).inflate(R.layout.activity_we_chat_tweets_item, parent, false);
+                View titleView = LayoutInflater.from(context).inflate(R.layout.activity_we_chat_moments_item, parent, false);
                 return new MyViewHolder(titleView);
         }
     }
@@ -75,13 +75,13 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 displayWeChatFooter((FooterViewHolder) holder);
                 break;
             default:
-                displayWeChatTweets((MyViewHolder) holder, position);
+                displayWeChatMoments((MyViewHolder) holder, position);
                 break;
         }
     }
 
     private void displayWeChatFooter(FooterViewHolder holder) {
-        if (hasMoreTweets) {
+        if (hasMoreMoments) {
             holder.footView.setText(R.string.footer_view_more);
             new Handler().postDelayed(() -> updateRecyclerView(getWeChatMomentsCount(), getWeChatMomentsCount() + PAGE_COUNT), 500);
         } else {
@@ -113,7 +113,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 .into(holder.profileImage);
     }
 
-    private void displayWeChatTweets(@NonNull MyViewHolder holder, int position) {
+    private void displayWeChatMoments(@NonNull MyViewHolder holder, int position) {
         WeChatMoment weChatMoment = weChatMoments.get(position - 1);
         User sender = weChatMoment.getSender();
         initGridImageView(holder);
@@ -199,8 +199,8 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return weChatMoments.size();
     }
 
-    public void updateList(List<WeChatMoment> newWeChatMoments, boolean hasMoreTweets) {
-        this.hasMoreTweets = hasMoreTweets;
+    public void updateList(List<WeChatMoment> newWeChatMoments, boolean hasMoreMoments) {
+        this.hasMoreMoments = hasMoreMoments;
         if (newWeChatMoments != null) {
             weChatMoments.addAll(newWeChatMoments);
         }
@@ -217,7 +217,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
             this.senderUsername = itemView.findViewById(R.id.sender_username);
             this.senderContent = itemView.findViewById(R.id.sender_content);
-            this.avatar = itemView.findViewById(R.id.tweets_avatar);
+            this.avatar = itemView.findViewById(R.id.moments_avatar);
             this.nineGridImageView = itemView.findViewById(R.id.images_view);
             this.commentsView = itemView.findViewById(R.id.comments_view);
         }
