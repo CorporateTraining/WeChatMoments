@@ -107,8 +107,9 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public void glideImage(String url, ImageView imageView) {
+        String TEMPORARY_PICTURE_URL = "https://ssyerv1.oss-cn-hangzhou.aliyuncs.com/picture/7b61a18c07a94c35bf14686f89ca71b5.jpg";
         Glide.with(context)
-                .load(url)
+                .load(TEMPORARY_PICTURE_URL)
                 .centerCrop()
                 .placeholder(R.drawable.loading)
                 .into(imageView);
