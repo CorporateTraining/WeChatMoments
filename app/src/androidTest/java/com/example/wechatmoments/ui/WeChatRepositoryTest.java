@@ -7,12 +7,17 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.example.wechatmoments.repository.WeChatRepositoryImpl;
 import com.example.wechatmoments.repository.data.WeChatData;
 import com.example.wechatmoments.repository.entity.User;
+import com.example.wechatmoments.repository.entity.WeChatMoment;
+import com.example.wechatmoments.repository.entity.vo.Comment;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.schedulers.Schedulers;
 
@@ -40,6 +45,7 @@ public class WeChatRepositoryTest {
 //        userRepository.findByName(CREATE_USER_NAME).test()
 //                .assertValue(user -> user.getId() == savedUser.getId());
     }
+
     @Test
     public void should_find_correct_user() {
         String CREATE_USERNAME = "username";
@@ -68,6 +74,27 @@ public class WeChatRepositoryTest {
                 .assertValue(user -> AVATAR.equals(user.getAvatar()))
                 .assertValue(user -> PROFILE_IMAGE.equals(user.getProfileImage()))
                 .assertValue(user -> USERNAME.equals(user.getUsername()));
+    }
+
+    @Test
+    public void should_find_correct_we_chat_moment() {
+        String CREATE_CONTENT = "content";
+        List<String> CREATE_IMAGES = new ArrayList<>();
+        User CREATE_SENDER = new User();
+        List<Comment> CREATE_COMMENTS = new ArrayList<>();
+        Integer TYPE = 1;
+        List<WeChatMoment> weChatMoments = new ArrayList<>();
+        WeChatMoment weChatMoment = new WeChatMoment(CREATE_CONTENT, CREATE_IMAGES, CREATE_SENDER, CREATE_COMMENTS, TYPE);
+        weChatMoments.add(weChatMoment);
+        WeChatData.setWeChatMoments(weChatMoments);
+        weChatRepository.findWeChatMoment()
+                .test()
+                .assertValue(findWeChatMoments -> findWeChatMoments.size() == 1)
+                .assertValue(findWeChatMoments -> CREATE_CONTENT.equals(findWeChatMoments.get(0).getContent()))
+                .assertValue(findWeChatMoments -> CREATE_SENDER.equals(findWeChatMoments.get(0).getSender()))
+                .assertValue(findWeChatMoments -> CREATE_COMMENTS.equals(findWeChatMoments.get(0).getComments()))
+                .assertValue(findWeChatMoments -> CREATE_IMAGES.equals(findWeChatMoments.get(0).getImages()))
+                .assertValue(findWeChatMoments -> TYPE.equals(findWeChatMoments.get(0).getType()));
     }
 
 }

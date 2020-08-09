@@ -11,6 +11,17 @@ public class WeChatMoment {
     private List<Comment> comments;
     private Integer type = 1;
 
+    public WeChatMoment(String content, List<String> images, User sender, List<Comment> comments, Integer type) {
+        this.content = content;
+        this.images = images;
+        this.sender = sender;
+        this.comments = comments;
+        this.type = type;
+    }
+
+    public WeChatMoment() {
+    }
+
     public void setType(Integer type) {
         this.type = type;
     }
