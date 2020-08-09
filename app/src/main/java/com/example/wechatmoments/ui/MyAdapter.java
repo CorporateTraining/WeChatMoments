@@ -105,11 +105,13 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Glide.with(context)
                 .load(user.getAvatar())
                 .centerCrop()
+                .placeholder(R.drawable.loading)
                 .apply(RequestOptions.bitmapTransform(new RoundedCorners(20)))
                 .into(holder.headerAvatar);
         Glide.with(context)
                 .load(user.getProfileImage())
                 .centerCrop()
+                .placeholder(R.drawable.loading)
                 .into(holder.profileImage);
     }
 
@@ -146,6 +148,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             protected void onDisplayImage(Context context, ImageView imageView, String url) {
                 Glide.with(context)
                         .load(url)
+                        .placeholder(R.drawable.loading)
                         .centerCrop()
                         .into(imageView);
             }
@@ -157,6 +160,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 .load(sender.getAvatar())
                 .centerCrop()
                 .apply(RequestOptions.bitmapTransform(new RoundedCorners(20)))
+                .placeholder(R.drawable.loading)
                 .into(holder.avatar);
         holder.senderUsername.setText(sender.getNick());
     }
