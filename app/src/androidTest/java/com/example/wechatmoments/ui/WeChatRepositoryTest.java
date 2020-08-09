@@ -97,4 +97,19 @@ public class WeChatRepositoryTest {
                 .assertValue(findWeChatMoments -> TYPE.equals(findWeChatMoments.get(0).getType()));
     }
 
+    @Test
+    public void should_find_correct_we_chat_moment_by_net_work() {
+        String CONTENT = "沙发！";
+        String USERNAME = "jport";
+        String NICK = "Joe Portman";
+        weChatRepository.findWeChatMomentByNetWork()
+                .test()
+                .assertValue(findWeChatMoments -> findWeChatMoments.size() == 22)
+                .assertValue(findWeChatMoments -> CONTENT.equals(findWeChatMoments.get(0).getContent()))
+                .assertValue(findWeChatMoments -> USERNAME.equals(findWeChatMoments.get(0).getSender().getUsername()))
+                .assertValue(findWeChatMoments -> NICK.equals(findWeChatMoments.get(0).getSender().getNick()))
+                .assertValue(findWeChatMoments -> findWeChatMoments.get(0).getComments().size() == 2)
+                .assertValue(findWeChatMoments -> findWeChatMoments.get(0).getImages().size() == 3);
+    }
+
 }
