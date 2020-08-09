@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 import java.util.Collections;
 import java.util.List;
 
+import static com.example.wechatmoments.ui.WeChatActivity.PAGE_COUNT;
 import static com.jaeger.ninegridimageview.NineGridImageView.STYLE_FILL;
 
 
@@ -37,12 +39,18 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private User user;
     private WeChatViewModel weChatViewModel;
     private Context context;
-    public static final int TYPE_HEADER = 0;
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_FOOTER = -1;
+    private boolean hasMoreTweets;
 
     public MyAdapter(List<WeChatMoment> weChatMoments, WeChatViewModel weChatViewModel, User user) {
         this.weChatMoments = weChatMoments;
         this.weChatViewModel = weChatViewModel;
         this.user = user;
+    }
+
+    public void setHasMoreTweets(boolean hasMoreTweets) {
+        this.hasMoreTweets = hasMoreTweets;
     }
 
     @NonNull
@@ -53,6 +61,9 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case TYPE_HEADER:
                 View header = LayoutInflater.from(context).inflate(R.layout.activity_we_chat_header, parent, false);
                 return new HeaderViewHolder(header);
+            case TYPE_FOOTER:
+                View footerView = LayoutInflater.from(context).inflate(R.layout.activity_foot_view, parent, false);
+                return new FooterViewHolder(footerView);
             default:
                 View titleView = LayoutInflater.from(context).inflate(R.layout.activity_we_chat_tweets_item, parent, false);
                 return new MyViewHolder(titleView);
@@ -65,13 +76,37 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case TYPE_HEADER:
                 displayWeChatHeader((HeaderViewHolder) holder);
                 break;
+            case TYPE_FOOTER:
+                displayWeChatFooter((FooterViewHolder) holder);
+                break;
             default:
                 displayWeChatTweets((MyViewHolder) holder, position);
                 break;
         }
     }
 
-    private void displayWeChatHeader(@NonNull HeaderViewHolder holder) {
+    private void displayWeChatFooter(FooterViewHolder holder) {
+        if (hasMoreTweets) {
+            holder.footView.setText(R.string.footer_view_more);
+            new Handler().postDelayed(() -> updateRecyclerView(getWeChatMomentsCount(), getWeChatMomentsCount() + PAGE_COUNT), 500);
+
+        } else {
+            holder.footView.setText(R.string.footer_view_no_more);
+        }
+
+    }
+
+    public void updateRecyclerView(int fromIndex, int toIndex) {
+        List<WeChatMoment> newWeChatMoments = weChatViewModel.getWeChatMoments(fromIndex, toIndex);
+        if (newWeChatMoments != null) {
+            updateList(newWeChatMoments, true);
+        } else {
+            updateList(null, false);
+        }
+    }
+
+
+    private void displayWeChatHeader(HeaderViewHolder holder) {
         holder.username.setText(user.getNick());
         Glide.with(context)
                 .load(user.getAvatar())
@@ -141,12 +176,27 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (position == 0) {
             return TYPE_HEADER;
         }
+        if (position - 1 == weChatMoments.size()) {
+            return TYPE_FOOTER;
+        }
         return position;
     }
 
     @Override
     public int getItemCount() {
-        return weChatMoments.size() + 1;
+        return weChatMoments.size() + 2;
+    }
+
+    public int getWeChatMomentsCount() {
+        return weChatMoments.size();
+    }
+
+    public void updateList(List<WeChatMoment> newWeChatMoments, boolean hasMoreTweets) {
+        this.hasMoreTweets = hasMoreTweets;
+        if (newWeChatMoments != null) {
+            weChatMoments.addAll(newWeChatMoments);
+        }
+        new Handler().post(this::notifyDataSetChanged);
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -172,6 +222,15 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.username = itemView.findViewById(R.id.username);
             this.headerAvatar = itemView.findViewById(R.id.header_avatar);
             this.profileImage = itemView.findViewById(R.id.profile_image);
+        }
+    }
+
+    public static class FooterViewHolder extends RecyclerView.ViewHolder {
+        private TextView footView;
+
+        public FooterViewHolder(@NonNull View itemView) {
+            super(itemView);
+            this.footView = itemView.findViewById(R.id.foot_view);
         }
     }
 

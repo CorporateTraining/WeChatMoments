@@ -6,10 +6,13 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.wechatmoments.repository.data.WeChatData;
 import com.example.wechatmoments.repository.entity.User;
 import com.example.wechatmoments.repository.entity.WeChatMoment;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +46,28 @@ public class WeChatViewModel extends ViewModel {
         weChatMomentsMutableLiveData.observe(owner, observer);
     }
 
+    public List<WeChatMoment> getWeChatMoments(int firstIndex, int lastIndex) {
+        List<WeChatMoment> value = weChatMomentsMutableLiveData.getValue();
+        if (value == null) {
+            return null;
+        }
+        List<WeChatMoment> weChatMomentsFilter = filterCorrectWeChatMoments(value);
+        if (weChatMomentsFilter.size() <= firstIndex) {
+            return null;
+        }
+        if (weChatMomentsFilter.size() < lastIndex) {
+            lastIndex = weChatMomentsFilter.size();
+        }
+        return weChatMomentsFilter.subList(firstIndex, lastIndex);
+    }
+
+    @NotNull
+    private List<WeChatMoment> filterCorrectWeChatMoments(List<WeChatMoment> value) {
+        return value.stream()
+                .filter(weChatMoment -> weChatMoment.getSender() != null)
+                .collect(Collectors.toList());
+    }
+
     public void findUser() {
         Maybe<User> user = weChatRepository.findUser();
         user.subscribeOn(Schedulers.io())
@@ -73,7 +98,7 @@ public class WeChatViewModel extends ViewModel {
                 });
     }
 
-    public void findWeChatMoment() {
+    public void findWeChatMoment(SwipeRefreshLayout swipeRefreshLayout) {
         Maybe<List<WeChatMoment>> weChatMoment = weChatRepository.findWeChatMoment();
         weChatMoment.subscribeOn(Schedulers.io())
                 .switchIfEmpty(weChatRepository.findWeChatMomentByNetWork()
@@ -87,8 +112,11 @@ public class WeChatViewModel extends ViewModel {
 
                     @Override
                     public void onSuccess(List<WeChatMoment> weChatMoments) {
-                        List<WeChatMoment> weChatMomentsFilter = weChatMoments.stream().filter(weChatMoment -> weChatMoment.getSender() != null).collect(Collectors.toList());
+                        List<WeChatMoment> weChatMomentsFilter = filterCorrectWeChatMoments(weChatMoments);
                         weChatMomentsMutableLiveData.postValue(weChatMomentsFilter);
+                        if (swipeRefreshLayout != null) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
                         Log.d(TAG, "onSuccess:");
                     }
 

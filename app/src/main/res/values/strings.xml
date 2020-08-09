@@ -2,4 +2,6 @@
     <string name="app_name">WeChatMoments</string>
     <string name="profile_image">背景图片</string>
     <string name="avatar">头像</string>
+    <string name="footer_view_more">正在加载更多…</string>
+    <string name="footer_view_no_more">暂无更多数据</string>
 </resources>

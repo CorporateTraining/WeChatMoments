@@ -1,9 +1,6 @@
 package com.example.wechatmoments.ui;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -11,19 +8,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.bumptech.glide.Glide;
 import com.example.wechatmoments.R;
 import com.example.wechatmoments.repository.WeChatRepositoryImpl;
-import com.jaeger.ninegridimageview.NineGridImageView;
-import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 
-public class WeChatActivity extends AppCompatActivity{
+public class WeChatActivity extends AppCompatActivity {
     private WeChatViewModel weChatViewModel;
     private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
     private MyAdapter myAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private NineGridImageView nineGridImageView;
+    public static final int PAGE_COUNT = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,22 +24,24 @@ public class WeChatActivity extends AppCompatActivity{
         setContentView(R.layout.activity_we_chat);
         obtainViewModel();
         weChatViewModel.findUser();
-        weChatViewModel.findWeChatMoment();
+        weChatViewModel.findWeChatMoment(null);
         displayWeChatTweets();
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         recyclerView = findViewById(R.id.my_recycle_view);
-        nineGridImageView = findViewById(R.id.images_view);
+        dropDownRefreshData();
+    }
+
+    private void dropDownRefreshData() {
         swipeRefreshLayout.setRefreshing(false);
         swipeRefreshLayout.setColorSchemeResources(
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light,
                 android.R.color.holo_purple);
-        swipeRefreshLayout.setOnRefreshListener(() -> new Handler().postDelayed(() -> {
-            weChatViewModel.findWeChatMoment();
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            weChatViewModel.findWeChatMoment(swipeRefreshLayout);
             myAdapter.notifyDataSetChanged();
-            swipeRefreshLayout.setRefreshing(false);
-        }, 1000));
+        });
     }
 
     private void obtainViewModel() {
@@ -59,7 +54,8 @@ public class WeChatActivity extends AppCompatActivity{
         weChatViewModel.observerWeChatMoment(this, weChatMoments -> {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setHasFixedSize(true);
-            myAdapter = new MyAdapter(weChatMoments, weChatViewModel, weChatViewModel.getUser());
+            myAdapter = new MyAdapter(weChatViewModel.getWeChatMoments(0, PAGE_COUNT), weChatViewModel, weChatViewModel.getUser());
+            myAdapter.setHasMoreTweets(weChatMoments.size() > PAGE_COUNT);
             recyclerView.setAdapter(myAdapter);
         });
     }
