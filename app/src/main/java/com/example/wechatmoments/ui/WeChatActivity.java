@@ -1,38 +1,29 @@
 package com.example.wechatmoments.ui;
 
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.wechatmoments.R;
 import com.example.wechatmoments.repository.WeChatRepositoryImpl;
 
 public class WeChatActivity extends AppCompatActivity {
     private WeChatViewModel weChatViewModel;
-    private ImageView profileImage, avatar;
-    private TextView username;
-    private RequestManager requestManager;
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private MyAdapter myAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_we_chat);
-        profileImage = findViewById(R.id.profile_image);
-        username = findViewById(R.id.username);
-        avatar = findViewById(R.id.avatar);
-        requestManager = Glide.with(getApplicationContext());
         obtainViewModel();
         weChatViewModel.findUser();
-        weChatUserProfile();
+        weChatViewModel.findWeChatMoment();
+        displayWeChatTweets();
     }
 
     private void obtainViewModel() {
@@ -41,11 +32,14 @@ public class WeChatActivity extends AppCompatActivity {
         weChatViewModel.setWeChatRepository(weChatRepository);
     }
 
-    private void weChatUserProfile() {
-        weChatViewModel.observerUserModel(this, user -> {
-            requestManager.load(user.getProfileImage()).centerCrop().into(profileImage);
-            requestManager.load(user.getAvatar()).centerCrop().apply(RequestOptions.bitmapTransform(new RoundedCorners(20))).into(avatar);
-            username.setText(user.getNick());
+    private void displayWeChatTweets() {
+        weChatViewModel.observerWeChatMoment(this, weChatMoments -> {
+            recyclerView = findViewById(R.id.my_recycle_view);
+            recyclerView.setHasFixedSize(true);
+            layoutManager = new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(layoutManager);
+            myAdapter = new MyAdapter(weChatMoments, weChatViewModel, weChatViewModel.getUser());
+            recyclerView.setAdapter(myAdapter);
         });
     }
 
