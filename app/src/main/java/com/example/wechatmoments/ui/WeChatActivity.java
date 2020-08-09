@@ -1,7 +1,9 @@
 package com.example.wechatmoments.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -9,8 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.Glide;
 import com.example.wechatmoments.R;
 import com.example.wechatmoments.repository.WeChatRepositoryImpl;
+import com.jaeger.ninegridimageview.NineGridImageView;
+import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 
 public class WeChatActivity extends AppCompatActivity{
     private WeChatViewModel weChatViewModel;
@@ -18,6 +23,7 @@ public class WeChatActivity extends AppCompatActivity{
     private RecyclerView.LayoutManager layoutManager;
     private MyAdapter myAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private NineGridImageView nineGridImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +35,7 @@ public class WeChatActivity extends AppCompatActivity{
         displayWeChatTweets();
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         recyclerView = findViewById(R.id.my_recycle_view);
+        nineGridImageView = findViewById(R.id.images_view);
         swipeRefreshLayout.setRefreshing(false);
         swipeRefreshLayout.setColorSchemeResources(
                 android.R.color.holo_green_light,
@@ -55,10 +62,5 @@ public class WeChatActivity extends AppCompatActivity{
             myAdapter = new MyAdapter(weChatMoments, weChatViewModel, weChatViewModel.getUser());
             recyclerView.setAdapter(myAdapter);
         });
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
     }
 }

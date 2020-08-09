@@ -1,6 +1,9 @@
 package com.example.wechatmoments.ui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +15,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.wechatmoments.R;
 import com.example.wechatmoments.repository.entity.User;
 import com.example.wechatmoments.repository.entity.WeChatMoment;
@@ -31,7 +37,6 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private User user;
     private WeChatViewModel weChatViewModel;
     private Context context;
-    private RequestManager requestManager;
     public static final int TYPE_HEADER = 0;
 
     public MyAdapter(List<WeChatMoment> weChatMoments, WeChatViewModel weChatViewModel, User user) {
@@ -56,7 +61,6 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        requestManager = Glide.with(context);
         switch (getItemViewType(position)) {
             case TYPE_HEADER:
                 displayWeChatHeader((HeaderViewHolder) holder);
@@ -69,11 +73,13 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private void displayWeChatHeader(@NonNull HeaderViewHolder holder) {
         holder.username.setText(user.getNick());
-        requestManager.load(user.getAvatar())
+        Glide.with(context)
+                .load(user.getAvatar())
                 .centerCrop()
                 .apply(RequestOptions.bitmapTransform(new RoundedCorners(20)))
                 .into(holder.headerAvatar);
-        requestManager.load(user.getProfileImage())
+        Glide.with(context)
+                .load(user.getProfileImage())
                 .centerCrop()
                 .into(holder.profileImage);
     }
@@ -81,13 +87,29 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private void displayWeChatTweets(@NonNull MyViewHolder holder, int position) {
         WeChatMoment weChatMoment = weChatMoments.get(position - 1);
         User sender = weChatMoment.getSender();
+        initGridImageView(holder);
         displayAvatarAndUserName(holder, sender);
         displayContent(holder, weChatMoment);
         displayImages(holder, weChatMoment);
     }
 
+    private void initGridImageView(@NonNull MyViewHolder holder) {
+        holder.nineGridImageView.setShowStyle(STYLE_FILL);
+        holder.nineGridImageView.setMaxSize(9);
+        holder.nineGridImageView.setAdapter(new NineGridImageViewAdapter<String>() {
+            @Override
+            protected void onDisplayImage(Context context, ImageView imageView, String url) {
+                Glide.with(context)
+                        .load(url)
+                        .centerCrop()
+                        .into(imageView);
+            }
+        });
+    }
+
     private void displayAvatarAndUserName(@NonNull MyViewHolder holder, User sender) {
-        requestManager.load(sender.getAvatar())
+        Glide.with(context)
+                .load(sender.getAvatar())
                 .centerCrop()
                 .apply(RequestOptions.bitmapTransform(new RoundedCorners(20)))
                 .into(holder.avatar);
@@ -98,7 +120,7 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         List<String> images = weChatMoment.getImages();
         if (images != null) {
             holder.nineGridImageView.setVisibility(View.VISIBLE);
-            displayGridImageView(holder, images);
+            holder.nineGridImageView.setImagesData(images);
         } else {
             holder.nineGridImageView.setVisibility(View.GONE);
         }
@@ -113,26 +135,6 @@ public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             holder.senderContent.setVisibility(View.GONE);
         }
     }
-
-    private void displayGridImageView(@NonNull MyViewHolder holder, List<String> images) {
-        NineGridImageViewAdapter<String> mAdapter = new NineGridImageViewAdapter<String>() {
-            @Override
-            protected void onDisplayImage(Context context, ImageView imageView, String url) {
-                requestManager.load(url)
-                        .into(imageView);
-            }
-
-            @Override
-            protected ImageView generateImageView(Context context) {
-                return super.generateImageView(context);
-            }
-        };
-        holder.nineGridImageView.setImagesData(images);
-        holder.nineGridImageView.setAdapter(mAdapter);
-        holder.nineGridImageView.setMaxSize(images.size());
-        holder.nineGridImageView.setShowStyle(STYLE_FILL);
-    }
-
 
     @Override
     public int getItemViewType(int position) {
